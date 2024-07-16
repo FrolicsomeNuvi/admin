@@ -1,0 +1,42 @@
+local MainAccount = "gferwtwe4atw4afa"
+
+game.Players[MainAccount].Chatted:Connect(function(msg)
+  local lowerMsg = msg:lower()
+  if lowerMsg == ".bring" then
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players[MainAccount].Character.HumanoidRootPart.Position) * CFrame.new(0, 2, 0)
+  elseif lowerMsg == ".kick" then
+    game.Players.LocalPlayer:Kick("TheFartMan Kicked You.")
+  elseif lowerMsg == ".freeze" then
+    game.Players.LocalPlayer.Character.LowerTorso.Anchored = true
+    game.Players.LocalPlayer.Character.UpperTorso.Anchored = true
+  elseif lowerMsg == ".unfreeze" then
+    game.Players.LocalPlayer.Character.LowerTorso.Anchored = false
+    game.Players.LocalPlayer.Character.UpperTorso.Anchored = false
+  elseif lowerMsg == ".test" then
+    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("I'm Using Nebulon", "All")
+  elseif lowerMsg == ".blind" then
+    game.Workspace.Camera:Destroy()
+  elseif lowerMsg == ".fling" then
+    game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 99999, 99999)
+  elseif lowerMsg == ".kill" then
+    game.Players.LocalPlayer.Character.Humanoid:ChangeState(15)
+    task.wait()
+    game.Players.LocalPlayer.Character.Humanoid:ChangeState(16)
+    task.wait()
+    game.Players.LocalPlayer.Character.Humanoid:ChangeState(0)
+  elseif lowerMsg == ".orbit" then
+    getgenv().orbit = true
+  elseif lowerMsg == ".unorbit" then
+    getgenv().orbit = false
+  elseif lowerMsg:sub(1, 4) == ".say" then
+    local sayMsg = msg:sub(6)  -- Extract the message after ".say "
+    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(sayMsg, "All")
+  end
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+  if getgenv().orbit == true then
+    local CurrentTime = tick()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players[MainAccount].Character.HumanoidRootPart.Position) * CFrame.Angles(0, 2 * math.pi * CurrentTime * 1 % (2 * math.pi), 0) * CFrame.new(0, 0, 10)
+  end
+end)
