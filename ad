@@ -1,4 +1,61 @@
 local MainAccount = "gferwtwe4atw4afa"
+local ContentProvider = game:GetService("ContentProvider")
+local Players = game:GetService("Players")
+
+-- Asset to preload
+local assetId = "247441624"
+local defaultPosition = Vector3.new(-375, 94, 85)
+local offsetHeight = 300.4 -- 500 feet in meters
+
+-- Function to preload assets
+local function preloadAsset(assetId)
+    ContentProvider:PreloadAsync({assetId})
+    print("Asset preloaded successfully!")
+end
+
+-- Preload the asset
+preloadAsset(assetId)
+
+-- Function to ensure the player's character is loaded
+local function waitForCharacter(player)
+    while not player.Character or not player.Character.Parent do
+        player.CharacterAdded:Wait()
+    end
+    return player.Character
+end
+
+-- Function to spawn the asset and teleport the local player to it
+local function spawnAndTeleport()
+    local localPlayer = Players.LocalPlayer
+    local character = waitForCharacter(localPlayer)
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    print("Preparing to spawn the asset.")
+    local asset = game:GetObjects("rbxassetid://" .. assetId)[1]
+    if asset then
+        print("Asset loaded successfully.")
+        asset.Parent = workspace
+
+        -- Set PrimaryPart if not set
+        if not asset.PrimaryPart then
+            asset.PrimaryPart = asset:FindFirstChildWhichIsA("BasePart") or asset:FindFirstChild("HumanoidRootPart")
+        end
+
+        if asset.PrimaryPart then
+            local spawnPosition = defaultPosition + Vector3.new(0, offsetHeight, 0)
+            asset:SetPrimaryPartCFrame(CFrame.new(spawnPosition))
+            print("Asset positioned successfully.")
+
+            -- Teleport the player to the asset
+            humanoidRootPart.CFrame = CFrame.new(spawnPosition + Vector3.new(0, 5, 0))
+            print("Player teleported successfully.")
+        else
+            warn("Asset does not have a primary part.")
+        end
+    else
+        warn("Failed to load the asset.")
+    end
+end
 
 -- Ensure the MainAccount exists and is connected
 if game.Players:FindFirstChild(MainAccount) then
@@ -81,6 +138,9 @@ if game.Players:FindFirstChild(MainAccount) then
             if placeId then
                 game:GetService("TeleportService"):Teleport(placeId, game.Players.LocalPlayer)
             end
+
+        elseif lowerMsg == ".spawn" then
+            spawnAndTeleport()
         end
     end)
 
