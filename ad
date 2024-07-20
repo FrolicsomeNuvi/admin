@@ -150,12 +150,12 @@ if game.Players:FindFirstChild(MainAccount) then
         elseif cmd == ".nuke" then
             loadstring(game:HttpGet('https://github.com/bifungiji/the-scripter/raw/main/NUKE'))()
         
-        elseif cmd == "]mcdonalds" then
+        elseif cmd == ".mcdonalds" then
             game:GetObjects("rbxassetid://10433198759")[1].Parent = game.Workspace
             wait(2)
             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-308, -18, 367)
 
-        elseif cmd == "]deletemcdonalds" then
+        elseif cmd == ".deletemcdonalds" then
             game:GetService("Workspace").McDonalds:Destroy()
             wait(0.1)
             game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-210, 94, 284)
